@@ -3,6 +3,7 @@ pub mod disk;
 pub mod memory;
 pub mod cpu;
 pub mod runtime;
+pub mod ethernet;
 
 use serde::{Deserialize, Serialize};
 
@@ -75,6 +76,7 @@ pub async fn run_all_checks() -> Vec<CheckResult> {
     results.push(disk::check_disk());
     results.push(network::check_dns().await);
     results.push(network::check_reachability().await);
+    results.extend(ethernet::check_interfaces());
 
     results
 }
