@@ -1,0 +1,21 @@
+[iff]
+serial_port = "/dev/ttyUSB0"
+baud_rate = 9600
+process_name = "iff-daemon"
+
+[gps]
+serial_port = "/dev/ttyUSB1"
+baud_rate = 4800
+nmea_required = true
+process_name = "gpsd"
+
+[link16]
+serial_port = "/dev/ttyUSB2"
+baud_rate = 115200
+tcp_host = "192.168.1.100"
+tcp_port = 5000
+process_name = "link16-terminal"
+
+[secure_link]
+process_name = "secure-link-daemon"
+expected_interface = "sl0"

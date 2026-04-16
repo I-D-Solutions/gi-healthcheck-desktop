@@ -26,3 +26,5 @@ chrono = { version = "0.4", features = ["serde"] }
 hostname = "0.4"
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "time"] }
 dirs = "6"
+toml = "0.8"
+serialport = "4"
