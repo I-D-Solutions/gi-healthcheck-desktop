@@ -1,69 +1,49 @@
 <script lang="ts">
-	import { invoke } from '@tauri-apps/api/core';
-	import type { CheckResult } from '$lib/types/health';
-	import { groupByCategory } from '$lib/types/health';
+	import { healthStore } from '$lib/stores/health.svelte';
 	import CategorySection from './CategorySection.svelte';
-
-	let results = $state<CheckResult[]>([]);
-	let running = $state(false);
-	let lastRun = $state<string | null>(null);
-	let error = $state<string | null>(null);
-
-	async function runChecks() {
-		running = true;
-		error = null;
-		try {
-			results = await invoke<CheckResult[]>('run_health_checks');
-			lastRun = new Date().toLocaleString();
-		} catch (e) {
-			error = String(e);
-		} finally {
-			running = false;
-		}
-	}
-
-	let groups = $derived(groupByCategory(results));
-	let summary = $derived({
-		total: results.length,
-		pass: results.filter((r) => r.status === 'pass').length,
-		warn: results.filter((r) => r.status === 'warn').length,
-		fail: results.filter((r) => r.status === 'fail').length
-	});
 </script>
 
 <div class="dashboard">
 	<header>
 		<div class="title-row">
-			<h1>Health Check</h1>
-			<button class="run-btn" onclick={runChecks} disabled={running}>
-				{running ? 'Running...' : 'Run Checks'}
+			<h1>
+				{#if healthStore.activeCategory}
+					{healthStore.activeCategory}
+				{:else}
+					Health Check
+				{/if}
+			</h1>
+			<button class="run-btn" onclick={healthStore.runChecks} disabled={healthStore.running}>
+				{healthStore.running ? 'Running...' : 'Run Checks'}
 			</button>
 		</div>
-		{#if lastRun}
-			<p class="last-run">Last run: {lastRun}</p>
+		{#if healthStore.lastRun}
+			<p class="last-run">Last run: {healthStore.lastRun}</p>
 		{/if}
 	</header>
 
-	{#if error}
-		<div class="error-banner">{error}</div>
+	{#if healthStore.error}
+		<div class="error-banner">{healthStore.error}</div>
 	{/if}
 
-	{#if results.length > 0}
-		<div class="summary">
-			<div class="stat total">{summary.total} checks</div>
-			<div class="stat pass">{summary.pass} passed</div>
-			{#if summary.warn > 0}
-				<div class="stat warn">{summary.warn} warnings</div>
-			{/if}
-			{#if summary.fail > 0}
-				<div class="stat fail">{summary.fail} failed</div>
-			{/if}
-		</div>
+	{#if healthStore.results.length > 0}
+		{#if !healthStore.activeCategory}
+			<div class="summary">
+				<div class="stat total">{healthStore.summary.total} checks</div>
+				<div class="stat pass">{healthStore.summary.pass} passed</div>
+				{#if healthStore.summary.warn > 0}
+					<div class="stat warn">{healthStore.summary.warn} warnings</div>
+				{/if}
+				{#if healthStore.summary.fail > 0}
+					<div class="stat fail">{healthStore.summary.fail} failed</div>
+				{/if}
+			</div>
+		{/if}
 
-		{#each groups as group (group.category)}
+		{#each healthStore.filteredGroups as group (group.category)}
 			<CategorySection {group} />
 		{/each}
-	{:else if !running}
+	{:else if !healthStore.running}
 		<div class="empty">
 			<p>Click <strong>Run Checks</strong> to start diagnostics.</p>
 		</div>

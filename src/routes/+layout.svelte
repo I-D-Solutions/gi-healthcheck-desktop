@@ -1,13 +1,48 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { healthStore } from '$lib/stores/health.svelte';
+
 	let { children }: { children: Snippet } = $props();
+
+	const statusColors: Record<string, string> = {
+		pass: '#10b981',
+		warn: '#f59e0b',
+		fail: '#ef4444'
+	};
 </script>
 
 <div class="shell">
 	<aside class="sidebar">
 		<div class="brand">GI Health Check</div>
 		<nav>
-			<a href="/" class="nav-item active">Dashboard</a>
+			<button
+				class="nav-item"
+				class:active={healthStore.activeCategory === null}
+				onclick={() => healthStore.setCategory(null)}
+			>
+				All Checks
+				{#if healthStore.results.length > 0}
+					<span class="count">{healthStore.results.length}</span>
+				{/if}
+			</button>
+
+			{#if healthStore.groups.length > 0}
+				<div class="nav-divider"></div>
+				{#each healthStore.groups as group (group.category)}
+					<button
+						class="nav-item"
+						class:active={healthStore.activeCategory === group.category}
+						onclick={() => healthStore.setCategory(group.category)}
+					>
+						<span
+							class="status-dot"
+							style="background: {statusColors[group.worstStatus]}"
+						></span>
+						{group.category}
+						<span class="count">{group.checks.length}</span>
+					</button>
+				{/each}
+			{/if}
 		</nav>
 		<div class="version">v0.1.0</div>
 	</aside>
@@ -59,20 +94,48 @@
 	nav {
 		flex: 1;
 		padding: 16px 0;
+		overflow-y: auto;
 	}
 	.nav-item {
-		display: block;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		width: 100%;
 		padding: 8px 20px;
 		color: var(--sidebar-fg);
 		text-decoration: none;
-		font-size: 0.9rem;
+		font-size: 0.85rem;
+		font-family: inherit;
+		border: none;
 		border-left: 3px solid transparent;
+		background: none;
+		cursor: pointer;
 		transition: all 0.15s;
+		text-align: left;
 	}
 	.nav-item:hover,
 	.nav-item.active {
 		background: rgba(255, 255, 255, 0.08);
 		border-left-color: #60a5fa;
+	}
+	.nav-divider {
+		height: 1px;
+		background: rgba(255, 255, 255, 0.08);
+		margin: 8px 20px;
+	}
+	.status-dot {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		flex-shrink: 0;
+	}
+	.count {
+		margin-left: auto;
+		font-size: 0.7rem;
+		background: rgba(255, 255, 255, 0.12);
+		padding: 1px 6px;
+		border-radius: 8px;
+		color: rgba(255, 255, 255, 0.5);
 	}
 	.version {
 		padding: 12px 20px 0;
