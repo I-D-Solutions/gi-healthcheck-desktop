@@ -1,16 +1,17 @@
-pub mod network;
-pub mod disk;
-pub mod memory;
+pub mod connected_devices;
 pub mod cpu;
-pub mod runtime;
+pub mod disk;
 pub mod ethernet;
-pub mod manifest;
-pub mod serial;
-pub mod process;
-pub mod iff;
 pub mod gps;
+pub mod iff;
 pub mod link16;
+pub mod manifest;
+pub mod memory;
+pub mod network;
+pub mod process;
+pub mod runtime;
 pub mod securelink;
+pub mod serial;
 
 use serde::{Deserialize, Serialize};
 
@@ -91,13 +92,17 @@ pub async fn run_all_checks() -> Vec<CheckResult> {
             results.extend(gps::run_checks(&config.gps));
             results.extend(link16::run_checks(&config.link16).await);
             results.extend(securelink::run_checks(&config.secure_link));
+            results.extend(connected_devices::run_checks(&config.extra_connected_devices).await);
         }
         Err(e) => {
-            results.push(CheckResult::warn(
-                "Device Manifest",
-                "Configuration",
-                "Could not load device manifest",
-            ).with_details(&e));
+            results.push(
+                CheckResult::warn(
+                    "Device Manifest",
+                    "Configuration",
+                    "Could not load device manifest",
+                )
+                .with_details(&e),
+            );
         }
     }
 

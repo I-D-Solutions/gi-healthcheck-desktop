@@ -7,6 +7,7 @@ process_name = "iff-daemon"
 serial_port = "COM4"
 baud_rate = 4800
 nmea_required = true
+expected_ip = "10.0.1.203"
 process_name = "gpsd"
 
 [link16]
@@ -41,13 +42,6 @@ expected_ip = "10.0.1.202"
 ports = [5000]
 required = true
 notes = "STT device"
-
-[[extra_connected_devices]]
-name = "GPS"
-kind = "network"
-expected_ip = "10.0.1.203"
-required = true
-notes = "Network GPS device"
 
 [[extra_connected_devices]]
 name = "MX12"
