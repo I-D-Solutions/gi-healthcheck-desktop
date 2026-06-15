@@ -1,21 +1,65 @@
 [iff]
-serial_port = "/dev/ttyUSB0"
+serial_port = "COM3"
 baud_rate = 9600
 process_name = "iff-daemon"
 
 [gps]
-serial_port = "/dev/ttyUSB1"
+serial_port = "COM4"
 baud_rate = 4800
 nmea_required = true
 process_name = "gpsd"
 
 [link16]
-serial_port = "/dev/ttyUSB2"
+serial_port = "COM5"
 baud_rate = 115200
-tcp_host = "192.168.1.100"
+tcp_host = "10.0.1.202"
 tcp_port = 5000
 process_name = "link16-terminal"
 
 [secure_link]
 process_name = "secure-link-daemon"
-expected_interface = "sl0"
+expected_interface = "Ethernet"
+
+[[extra_connected_devices]]
+name = "Switch"
+kind = "network"
+expected_ip = "10.0.1.200"
+required = true
+notes = "POD switch"
+
+[[extra_connected_devices]]
+name = "Computer"
+kind = "network"
+expected_ip = "10.0.1.201"
+required = true
+notes = "Windows desktop in POD"
+
+[[extra_connected_devices]]
+name = "STT"
+kind = "network"
+expected_ip = "10.0.1.202"
+ports = [5000]
+required = true
+notes = "STT device"
+
+[[extra_connected_devices]]
+name = "GPS"
+kind = "network"
+expected_ip = "10.0.1.203"
+required = true
+notes = "Network GPS device"
+
+[[extra_connected_devices]]
+name = "MX12"
+kind = "network"
+expected_ip = "10.0.1.204"
+baud_rate = 57600
+required = true
+notes = "MX12/TX12 device; default baud rate"
+
+[[extra_connected_devices]]
+name = "Wireless Router"
+kind = "network"
+expected_ip = "10.0.1.205"
+required = true
+notes = "POD wireless router"
